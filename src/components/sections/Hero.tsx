@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { MagneticButton } from '../ui/MagneticButton';
 import { ChevronDown, Download, ArrowRight } from 'lucide-react';
 import { personalInfo } from '../../data/portfolio';
 import { usePrefersReducedMotion } from '../../hooks/useAnimations';
@@ -87,15 +88,15 @@ export const Hero = () => {
         </motion.div>
 
         <motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-6 mb-16">
-          <a 
+          <MagneticButton 
             href="#projects"
-            className="group relative inline-flex items-center gap-2 px-8 py-4 bg-[var(--color-accent)] text-[var(--color-bg-primary)] font-mono font-medium text-sm tracking-wide rounded-sm overflow-hidden transition-transform hover:scale-[1.02]"
+            className="group relative inline-flex items-center gap-2 px-8 py-4 bg-[var(--color-accent)] text-[var(--color-bg-primary)] font-mono font-medium text-sm tracking-wide rounded-sm overflow-hidden transition-transform"
           >
             <span>View My Work</span>
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-          </a>
+          </MagneticButton>
           
-          <a 
+          <MagneticButton 
             href={personalInfo?.resumeUrl || "#"}
             target="_blank"
             rel="noopener noreferrer"
@@ -103,7 +104,7 @@ export const Hero = () => {
           >
             <span>Download Resume</span>
             <Download className="w-4 h-4" />
-          </a>
+          </MagneticButton>
         </motion.div>
 
         <motion.div variants={fadeInUp} className="flex items-center gap-6 text-[var(--color-text-secondary)]">

@@ -41,7 +41,7 @@ const Skills = () => {
             </h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 gap-12 border-t border-[var(--color-border)] pt-12">
+          <div className="grid grid-cols-1 gap-16 border-t border-[var(--color-border)] pt-12">
             {skillCategories.map((category) => (
               <motion.div 
                 key={category.name}
@@ -58,7 +58,7 @@ const Skills = () => {
                   {category.skills.map((skill) => (
                     <li 
                       key={skill}
-                      className="px-4 py-2 rounded-sm bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] hover:bg-[var(--color-accent-dim)] transition-colors duration-300 ease-out text-sm font-medium cursor-default"
+                      className="px-5 py-3 rounded-sm bg-[var(--color-bg-secondary)] border border-[var(--color-border)] text-[var(--color-text-primary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] hover:bg-[var(--color-accent-dim)] transition-colors duration-300 ease-out text-sm font-medium cursor-default"
                     >
                       {skill}
                     </li>

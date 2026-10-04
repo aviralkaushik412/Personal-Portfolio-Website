@@ -2,6 +2,7 @@ import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { personalInfo } from '../../data/portfolio';
 import { useInView, usePrefersReducedMotion } from '../../hooks/useAnimations';
+import { MagneticButton } from '../ui/MagneticButton';
 import { ArrowRight } from 'lucide-react';
 
 const Contact = () => {
@@ -38,13 +39,13 @@ const Contact = () => {
           </p>
 
           <div className="pt-8 pb-16">
-            <a 
+            <MagneticButton 
               href={`mailto:${personalInfo.email}`}
-              className="group relative inline-flex items-center gap-2 px-10 py-5 bg-[var(--color-text-primary)] text-[var(--color-bg-primary)] font-mono font-medium rounded-sm overflow-hidden transition-transform hover:scale-[1.02]"
+              className="group relative inline-flex items-center gap-2 px-10 py-5 bg-[var(--color-text-primary)] text-[var(--color-bg-primary)] font-mono font-medium rounded-sm overflow-hidden transition-transform"
             >
               <span>Say Hello</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </a>
+            </MagneticButton>
           </div>
 
           <div className="flex justify-center items-center gap-8 text-[var(--color-text-secondary)]">

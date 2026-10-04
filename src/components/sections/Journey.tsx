@@ -29,7 +29,7 @@ export default function Journey() {
           initial={reducedMotion ? 'visible' : 'hidden'}
           animate={isInView ? 'visible' : 'hidden'}
           custom={0}
-          className="mb-6"
+          className="mb-8"
         >
           <span className="label">Background</span>
         </motion.div>
@@ -51,7 +51,7 @@ export default function Journey() {
           {/* EXPERIENCE SECTION */}
           <div className="lg:pr-16 relative z-10">
             <h3 className="heading-md mb-8 text-[var(--color-text-primary)]">Experience</h3>
-            <div className="space-y-12">
+            <div className="space-y-20">
               {experience.map((exp, index) => (
                 <motion.div
                   key={exp.id}
@@ -60,7 +60,7 @@ export default function Journey() {
                   whileInView="visible"
                   viewport={{ once: true, margin: '-50px' }}
                   custom={index}
-                  className="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] p-8 rounded-sm hover:border-[var(--color-accent-dim)] transition-colors relative"
+                  className="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] p-10 md:p-12 rounded-sm hover:border-[var(--color-accent-dim)] transition-colors relative"
                 >
                   <div className="hidden lg:block absolute top-8 -right-[64px] w-3 h-3 rounded-full bg-[var(--color-bg-primary)] border-2 border-[var(--color-accent)] z-20" />
                   
@@ -74,7 +74,7 @@ export default function Journey() {
                     </span>
                   </div>
                   
-                  <ul className="space-y-3 mb-6">
+                  <ul className="space-y-3 mb-8">
                     {exp.description.map((desc, i) => (
                       <li key={i} className="text-[var(--color-text-secondary)] body-md flex items-start gap-3">
                         <span className="text-[var(--color-accent)] mt-2 w-1 h-1 rounded-full shrink-0" />
@@ -102,9 +102,9 @@ export default function Journey() {
           <div className="hidden lg:block" />
 
           {/* EDUCATION SECTION */}
-          <div className="lg:pl-16 relative z-10 lg:-mt-32">
+          <div className="lg:pl-16 relative z-10 lg:-mt-48">
             <h3 className="heading-md mb-8 text-[var(--color-text-primary)]">Education</h3>
-            <div className="space-y-8">
+            <div className="space-y-16">
               {education.map((edu, index) => (
                 <motion.div
                   key={edu.id}
@@ -113,7 +113,7 @@ export default function Journey() {
                   whileInView="visible"
                   viewport={{ once: true, margin: '-50px' }}
                   custom={index}
-                  className="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] p-8 rounded-sm relative"
+                  className="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] p-10 md:p-12 rounded-sm relative"
                 >
                   <div className="hidden lg:block absolute top-8 -left-[64px] w-3 h-3 rounded-full bg-[var(--color-bg-primary)] border-2 border-[var(--color-text-tertiary)] z-20" />
                   
@@ -133,30 +133,30 @@ export default function Journey() {
         </div>
 
         {/* PROBLEM SOLVING SECTION */}
-        <div className="mt-32">
+        <div className="mt-48">
           <motion.div
             variants={fadeUp}
             initial={reducedMotion ? 'visible' : 'hidden'}
             whileInView="visible"
             viewport={{ once: true, margin: '-50px' }}
-            className="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] p-8 md:p-16 rounded-sm relative overflow-hidden"
+            className="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] p-12 md:p-24 rounded-sm relative overflow-hidden"
           >
             <div className="text-center mb-16">
-              <h3 className="font-mono text-sm tracking-widest uppercase text-[var(--color-accent)] mb-6">Problem Solving</h3>
+              <h3 className="font-mono text-sm tracking-widest uppercase text-[var(--color-accent)] mb-8">Problem Solving</h3>
               <div className="text-7xl md:text-8xl font-sans font-bold text-[var(--color-text-primary)] mb-2 tracking-tighter">
                 1300<span className="text-[var(--color-accent)]">+</span>
               </div>
               <div className="text-[var(--color-text-secondary)] tracking-widest uppercase text-sm font-medium">Total Problems Solved</div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 max-w-4xl mx-auto">
               {codingProfiles.map((profile, i) => (
                 <a 
                   key={i} 
                   href={profile.url} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="group flex flex-col p-6 bg-[var(--color-bg-tertiary)] rounded-sm border border-[var(--color-border)] hover:border-[var(--color-accent-dim)] transition-all duration-300"
+                  className="group flex flex-col p-8 bg-[var(--color-bg-tertiary)] rounded-sm border border-[var(--color-border)] hover:border-[var(--color-accent-dim)] transition-all duration-300"
                 >
                   <div className="flex justify-between items-center mb-4">
                     <span className="text-[var(--color-text-primary)] font-medium group-hover:text-[var(--color-accent)] transition-colors">{profile.platform}</span>
@@ -173,7 +173,7 @@ export default function Journey() {
         </div>
 
         {/* CERTIFICATIONS */}
-        <div className="mt-32">
+        <div className="mt-48">
           <motion.div
             variants={fadeUp}
             initial={reducedMotion ? 'visible' : 'hidden'}
@@ -184,7 +184,7 @@ export default function Journey() {
             <h3 className="heading-md text-[var(--color-text-primary)] text-center">Certifications</h3>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
             {certificates.slice(0, 5).map((cert, i) => (
               <motion.div 
                 key={cert.id} 
@@ -193,9 +193,9 @@ export default function Journey() {
                 whileInView="visible"
                 viewport={{ once: true, margin: '-50px' }}
                 custom={i}
-                className="p-8 bg-[var(--color-bg-secondary)] rounded-sm border border-[var(--color-border)] flex flex-col h-full"
+                className="p-10 bg-[var(--color-bg-secondary)] rounded-sm border border-[var(--color-border)] flex flex-col h-full"
               >
-                <h4 className="text-[var(--color-text-primary)] font-medium text-base mb-6 leading-relaxed flex-grow">{cert.title}</h4>
+                <h4 className="text-[var(--color-text-primary)] font-medium text-base mb-8 leading-relaxed flex-grow">{cert.title}</h4>
                 <div className="flex justify-between items-center text-xs mt-auto pt-4 border-t border-[var(--color-border)]">
                   <span className="text-[var(--color-text-secondary)] truncate pr-4">{cert.issuer}</span>
                   <span className="text-[var(--color-text-tertiary)] font-mono shrink-0">{cert.year}</span>

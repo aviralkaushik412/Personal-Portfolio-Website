@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import Lenis from 'lenis';
 import { Navigation } from './components/layout/Navigation';
+import { CustomCursor } from './components/ui/CustomCursor';
 import { Hero } from './components/sections/Hero';
 import About from './components/sections/About';
 import Projects from './components/sections/Projects';
@@ -34,6 +35,7 @@ export default function App() {
       <div className="grain-overlay" aria-hidden="true" />
 
       {/* Navigation */}
+      <CustomCursor />
       <Navigation />
 
       {/* Main content */}

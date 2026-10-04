@@ -44,7 +44,7 @@ function ProjectCard({ project, index, onSelect }: any) {
     >
       <div className="absolute top-0 left-0 w-full h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)` }} />
       
-      <div className="p-8 sm:p-10 flex-grow flex flex-col">
+      <div className="p-10 sm:p-14 flex-grow flex flex-col">
         <div className="flex justify-between items-start mb-6">
           <span 
             className="text-[10px] sm:text-xs font-mono uppercase tracking-wider px-3 py-1 rounded-sm border"
@@ -220,14 +220,14 @@ export default function Projects() {
           Each project represents a real problem I wanted to solve, moving beyond standard tutorials into genuine engineering challenges.
         </motion.p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
           {featuredProjects.map((project, i) => (
             <ProjectCard key={project.id} project={project} index={i} onSelect={setSelectedId} />
           ))}
         </div>
 
         {otherProjects.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {otherProjects.map((project, i) => (
               <ProjectCard
                 key={project.id}
