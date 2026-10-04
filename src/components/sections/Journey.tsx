@@ -1,179 +1,211 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { experience, education, codingProfiles, certificates } from '../../data/portfolio';
 import { useInView, usePrefersReducedMotion } from '../../hooks/useAnimations';
 
-const TimelineItem = ({ children, index }: { children: React.ReactNode; index: number }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(0.1);
-  const prefersReducedMotion = usePrefersReducedMotion();
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 30 }}
-      animate={isInView || prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-      transition={{ duration: 0.6, delay: prefersReducedMotion ? 0 : index * 0.1, ease: [0.21, 0.47, 0.32, 0.98] as const }}
-      className="relative pl-8 md:pl-0"
-    >
-      <div className="md:hidden absolute left-[3.5px] top-6 w-2 h-2 rounded-full bg-[var(--color-accent)] shadow-[0_0_8px_var(--color-accent)] -translate-x-1/2" />
-      {children}
-    </motion.div>
-  );
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      delay: i * 0.1,
+      ease: [0.16, 1, 0.3, 1] as const,
+    },
+  }),
 };
 
-const Journey = () => {
+export default function Journey() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(0.1);
+  const reducedMotion = usePrefersReducedMotion();
+
   return (
-    <section id="journey" className="py-24 md:py-32 relative bg-[var(--color-bg-primary)]">
-      <div className="max-w-6xl mx-auto px-6 md:px-12">
+    <section id="journey" ref={sectionRef} className="section-padding relative">
+      <div className="section-container">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6 }}
-          className="mb-16 md:mb-24"
+          variants={fadeUp}
+          initial={reducedMotion ? 'visible' : 'hidden'}
+          animate={isInView ? 'visible' : 'hidden'}
+          custom={0}
+          className="mb-6"
         >
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-light text-[var(--color-text-primary)] mb-6 tracking-tight">
-            The <span className="text-[var(--color-accent)] italic font-[var(--font-serif)]">Journey</span>
-          </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-[var(--color-accent)] to-transparent" />
+          <span className="label">Background</span>
         </motion.div>
 
-        <div className="relative">
-          {/* Vertical Line */}
-          <div className="absolute left-0 md:left-1/2 top-0 bottom-0 w-px bg-[var(--color-border)] md:-translate-x-1/2" />
+        <motion.h2
+          variants={fadeUp}
+          initial={reducedMotion ? 'visible' : 'hidden'}
+          animate={isInView ? 'visible' : 'hidden'}
+          custom={1}
+          className="heading-lg mb-20 max-w-[700px]"
+        >
+          My <span className="serif-italic text-[var(--color-accent)]">Journey</span> so far.
+        </motion.h2>
 
-          {/* Experience Section */}
-          <div className="mb-24">
-            <h3 className="text-2xl md:text-3xl font-light text-[var(--color-text-primary)] mb-12 pl-8 md:pl-0 md:text-center">Experience</h3>
-            <div className="space-y-16">
-              {experience.map((exp, index) => (
-                <TimelineItem key={exp.id} index={index}>
-                  <div className={`md:flex items-start justify-between w-full ${index % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
-                    <div className="hidden md:block w-[calc(50%-3rem)]" />
-                    <div className="hidden md:block absolute left-1/2 top-8 w-3 h-3 rounded-full bg-[var(--color-bg-primary)] border-2 border-[var(--color-accent)] shadow-[0_0_10px_var(--color-accent-dim)] -translate-x-1/2 z-10" />
-                    <div className="w-full md:w-[calc(50%-3rem)] bg-[var(--color-bg-secondary)] border border-[var(--color-border)] p-6 md:p-8 rounded-2xl hover:border-[var(--color-accent-dim)] transition-colors duration-300 group">
-                      <div className="flex flex-col xl:flex-row xl:items-center justify-between mb-4 gap-2">
-                        <h4 className="text-xl md:text-2xl font-medium text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition-colors">{exp.role}</h4>
-                        <span className="text-sm font-[var(--font-mono)] text-[var(--color-accent)] whitespace-nowrap">{exp.period}</span>
-                      </div>
-                      <div className="text-[var(--color-text-secondary)] mb-6 font-medium flex items-center gap-2">
-                        {exp.company}
-                        <span className="text-[var(--color-text-tertiary)] text-sm hidden sm:inline">• {exp.location}</span>
-                      </div>
-                      <ul className="space-y-3 mb-8">
-                        {exp.description.map((desc, i) => (
-                          <li key={i} className="text-[var(--color-text-secondary)] text-sm leading-relaxed flex items-start gap-3">
-                            <span className="text-[var(--color-accent)] mt-1 text-[10px]">▹</span>
-                            <span>{desc}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <div className="flex flex-wrap gap-2 mt-auto">
-                        {exp.techStack.map((tech, i) => (
-                          <span key={i} className="text-xs font-[var(--font-mono)] text-[var(--color-text-tertiary)] bg-[var(--color-bg-tertiary)] px-3 py-1.5 rounded-full border border-[var(--color-border)]">
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </TimelineItem>
-              ))}
-            </div>
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1px_1fr] gap-12 lg:gap-0 relative">
+          {/* Desktop Center Line */}
+          <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-[var(--color-border)] -translate-x-1/2 z-0" />
 
-          {/* Education Section */}
-          <div className="mb-24">
-            <h3 className="text-2xl md:text-3xl font-light text-[var(--color-text-primary)] mb-12 pl-8 md:pl-0 md:text-center">Education</h3>
+          {/* EXPERIENCE SECTION */}
+          <div className="lg:pr-16 relative z-10">
+            <h3 className="heading-md mb-8 text-[var(--color-text-primary)]">Experience</h3>
             <div className="space-y-12">
-              {education.map((edu, index) => (
-                <TimelineItem key={edu.id} index={index}>
-                  <div className={`md:flex items-center justify-between w-full ${index % 2 !== 0 ? 'md:flex-row-reverse' : ''}`}>
-                    <div className="hidden md:block w-[calc(50%-3rem)]" />
-                    <div className="hidden md:block absolute left-1/2 top-1/2 w-3 h-3 rounded-full bg-[var(--color-bg-primary)] border-2 border-[var(--color-text-tertiary)] -translate-x-1/2 -translate-y-1/2 z-10" />
-                    <div className="w-full md:w-[calc(50%-3rem)] bg-[var(--color-bg-secondary)] border border-[var(--color-border)] p-6 md:p-8 rounded-2xl hover:bg-[var(--color-bg-tertiary)] transition-colors">
-                      <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-4 gap-2">
-                        <h4 className="text-lg font-medium text-[var(--color-text-primary)]">{edu.degree}</h4>
-                        <span className="text-sm font-[var(--font-mono)] text-[var(--color-text-tertiary)] whitespace-nowrap">{edu.period}</span>
-                      </div>
-                      <div className="text-[var(--color-text-secondary)] mb-4 text-base">
-                        {edu.institution}
-                      </div>
-                      <div className="flex justify-between items-center text-sm pt-4 border-t border-[var(--color-border)]">
-                        <span className="text-[var(--color-text-tertiary)]">{edu.location}</span>
-                        <span className="text-[var(--color-accent)] font-[var(--font-mono)] font-medium">{edu.score}</span>
-                      </div>
+              {experience.map((exp, index) => (
+                <motion.div
+                  key={exp.id}
+                  variants={fadeUp}
+                  initial={reducedMotion ? 'visible' : 'hidden'}
+                  whileInView="visible"
+                  viewport={{ once: true, margin: '-50px' }}
+                  custom={index}
+                  className="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] p-8 rounded-sm hover:border-[var(--color-accent-dim)] transition-colors relative"
+                >
+                  <div className="hidden lg:block absolute top-8 -right-[64px] w-3 h-3 rounded-full bg-[var(--color-bg-primary)] border-2 border-[var(--color-accent)] z-20" />
+                  
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-2">
+                    <div>
+                      <h4 className="text-xl font-bold text-[var(--color-text-primary)]">{exp.role}</h4>
+                      <div className="text-[var(--color-accent)] font-medium mt-1">{exp.company}</div>
                     </div>
+                    <span className="text-xs font-mono text-[var(--color-text-secondary)] bg-[var(--color-bg-tertiary)] px-3 py-1.5 rounded-sm border border-[var(--color-border)] shrink-0 self-start">
+                      {exp.period}
+                    </span>
                   </div>
-                </TimelineItem>
+                  
+                  <ul className="space-y-3 mb-6">
+                    {exp.description.map((desc, i) => (
+                      <li key={i} className="text-[var(--color-text-secondary)] body-md flex items-start gap-3">
+                        <span className="text-[var(--color-accent)] mt-2 w-1 h-1 rounded-full shrink-0" />
+                        <span>{desc}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="flex flex-wrap gap-2">
+                    {exp.techStack.map((tech, i) => (
+                      <span key={i} className="text-[10px] font-mono text-[var(--color-text-tertiary)] bg-[var(--color-bg-tertiary)] px-2 py-1 rounded-sm border border-[var(--color-border)]">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
               ))}
             </div>
           </div>
 
-          {/* DSA & Coding Profiles */}
-          <div className="mb-24">
-            <h3 className="text-2xl md:text-3xl font-light text-[var(--color-text-primary)] mb-12 pl-8 md:pl-0 md:text-center">Problem Solving</h3>
-            <TimelineItem index={0}>
-              <div className="md:flex items-center justify-center w-full">
-                <div className="hidden md:block absolute left-1/2 top-1/2 w-3 h-3 rounded-full bg-[var(--color-bg-primary)] border-2 border-[var(--color-accent)] -translate-x-1/2 -translate-y-1/2 z-10" />
-                <div className="w-full md:w-4/5 lg:w-3/4 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] p-6 md:p-10 rounded-2xl relative overflow-hidden group hover:border-[var(--color-accent-dim)] transition-colors duration-500">
-                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[var(--color-accent)] to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500" />
-                  <div className="text-center mb-10">
-                    <div className="text-5xl md:text-6xl font-[var(--font-mono)] text-[var(--color-text-primary)] mb-3 font-light tracking-tight">1300<span className="text-[var(--color-accent)]">+</span></div>
-                    <div className="text-[var(--color-text-secondary)] tracking-[0.2em] uppercase text-xs md:text-sm">Total Problems Solved</div>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {codingProfiles.map((profile, i) => (
-                      <a 
-                        key={i} 
-                        href={profile.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="group/link flex flex-col p-5 bg-[var(--color-bg-tertiary)] rounded-xl border border-[var(--color-border)] hover:border-[var(--color-accent-dim)] transition-all duration-300"
-                      >
-                        <div className="flex justify-between items-center mb-3">
-                          <span className="text-[var(--color-text-primary)] font-medium group-hover/link:text-[var(--color-accent)] transition-colors">{profile.platform}</span>
-                          {profile.badge && <span className="text-[10px] font-[var(--font-mono)] text-[var(--color-accent)] bg-[var(--color-accent-dim)] px-2 py-1 rounded-full uppercase tracking-wider">{profile.badge}</span>}
-                        </div>
-                        <div className="text-sm text-[var(--color-text-secondary)] mb-2 font-[var(--font-mono)]">{profile.handle}</div>
-                        <div className="text-sm text-[var(--color-text-tertiary)] mt-auto pt-3 border-t border-[var(--color-border)]">
-                          {profile.metric}: <span className="text-[var(--color-text-primary)] font-[var(--font-mono)] ml-1">{profile.metricValue}</span>
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </TimelineItem>
-          </div>
+          {/* Desktop Spacer for Layout */}
+          <div className="hidden lg:block" />
 
-          {/* Certificates */}
-          <div>
-            <h3 className="text-2xl md:text-3xl font-light text-[var(--color-text-primary)] mb-12 pl-8 md:pl-0 md:text-center">Certifications</h3>
-            <TimelineItem index={0}>
-               <div className="md:flex items-center justify-center w-full">
-                <div className="hidden md:block absolute left-1/2 top-1/2 w-3 h-3 rounded-full bg-[var(--color-bg-primary)] border-2 border-[var(--color-text-tertiary)] -translate-x-1/2 -translate-y-1/2 z-10" />
-                <div className="w-full md:w-4/5 lg:w-3/4 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] p-6 md:p-8 rounded-2xl">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {certificates.slice(0, 5).map((cert) => (
-                      <div key={cert.id} className="p-5 bg-[var(--color-bg-tertiary)] rounded-xl border border-[var(--color-border)] hover:bg-[var(--color-bg-primary)] transition-colors">
-                        <h4 className="text-[var(--color-text-primary)] font-medium text-sm mb-4 leading-relaxed">{cert.title}</h4>
-                        <div className="flex justify-between items-center text-xs mt-auto">
-                          <span className="text-[var(--color-text-secondary)] truncate mr-2">{cert.issuer}</span>
-                          <span className="text-[var(--color-text-tertiary)] font-[var(--font-mono)] shrink-0">{cert.year}</span>
-                        </div>
-                      </div>
-                    ))}
+          {/* Desktop Spacer for Layout */}
+          <div className="hidden lg:block" />
+
+          {/* EDUCATION SECTION */}
+          <div className="lg:pl-16 relative z-10 lg:-mt-32">
+            <h3 className="heading-md mb-8 text-[var(--color-text-primary)]">Education</h3>
+            <div className="space-y-8">
+              {education.map((edu, index) => (
+                <motion.div
+                  key={edu.id}
+                  variants={fadeUp}
+                  initial={reducedMotion ? 'visible' : 'hidden'}
+                  whileInView="visible"
+                  viewport={{ once: true, margin: '-50px' }}
+                  custom={index}
+                  className="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] p-8 rounded-sm relative"
+                >
+                  <div className="hidden lg:block absolute top-8 -left-[64px] w-3 h-3 rounded-full bg-[var(--color-bg-primary)] border-2 border-[var(--color-text-tertiary)] z-20" />
+                  
+                  <div className="flex flex-col mb-4">
+                    <h4 className="text-lg font-bold text-[var(--color-text-primary)]">{edu.degree}</h4>
+                    <span className="text-sm text-[var(--color-text-secondary)] mt-1">{edu.institution}</span>
                   </div>
-                </div>
-              </div>
-            </TimelineItem>
+                  
+                  <div className="flex justify-between items-center text-sm pt-4 border-t border-[var(--color-border)]">
+                    <span className="text-[var(--color-text-tertiary)]">{edu.period}</span>
+                    <span className="text-[var(--color-accent)] font-mono font-medium">{edu.score}</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
+
+        {/* PROBLEM SOLVING SECTION */}
+        <div className="mt-32">
+          <motion.div
+            variants={fadeUp}
+            initial={reducedMotion ? 'visible' : 'hidden'}
+            whileInView="visible"
+            viewport={{ once: true, margin: '-50px' }}
+            className="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] p-8 md:p-16 rounded-sm relative overflow-hidden"
+          >
+            <div className="text-center mb-16">
+              <h3 className="font-mono text-sm tracking-widest uppercase text-[var(--color-accent)] mb-6">Problem Solving</h3>
+              <div className="text-7xl md:text-8xl font-sans font-bold text-[var(--color-text-primary)] mb-2 tracking-tighter">
+                1300<span className="text-[var(--color-accent)]">+</span>
+              </div>
+              <div className="text-[var(--color-text-secondary)] tracking-widest uppercase text-sm font-medium">Total Problems Solved</div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              {codingProfiles.map((profile, i) => (
+                <a 
+                  key={i} 
+                  href={profile.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="group flex flex-col p-6 bg-[var(--color-bg-tertiary)] rounded-sm border border-[var(--color-border)] hover:border-[var(--color-accent-dim)] transition-all duration-300"
+                >
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-[var(--color-text-primary)] font-medium group-hover:text-[var(--color-accent)] transition-colors">{profile.platform}</span>
+                    {profile.badge && <span className="text-[10px] font-mono text-[var(--color-accent)] bg-[var(--color-accent-dim)] px-2 py-1 rounded-sm uppercase tracking-wider">{profile.badge}</span>}
+                  </div>
+                  <div className="text-sm text-[var(--color-text-secondary)] mb-4 font-mono">{profile.handle}</div>
+                  <div className="text-sm text-[var(--color-text-tertiary)] mt-auto pt-4 border-t border-[var(--color-border)]">
+                    {profile.metric}: <span className="text-[var(--color-text-primary)] font-mono ml-1">{profile.metricValue}</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+
+        {/* CERTIFICATIONS */}
+        <div className="mt-32">
+          <motion.div
+            variants={fadeUp}
+            initial={reducedMotion ? 'visible' : 'hidden'}
+            whileInView="visible"
+            viewport={{ once: true, margin: '-50px' }}
+            className="mb-12"
+          >
+            <h3 className="heading-md text-[var(--color-text-primary)] text-center">Certifications</h3>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {certificates.slice(0, 5).map((cert, i) => (
+              <motion.div 
+                key={cert.id} 
+                variants={fadeUp}
+                initial={reducedMotion ? 'visible' : 'hidden'}
+                whileInView="visible"
+                viewport={{ once: true, margin: '-50px' }}
+                custom={i}
+                className="p-8 bg-[var(--color-bg-secondary)] rounded-sm border border-[var(--color-border)] flex flex-col h-full"
+              >
+                <h4 className="text-[var(--color-text-primary)] font-medium text-base mb-6 leading-relaxed flex-grow">{cert.title}</h4>
+                <div className="flex justify-between items-center text-xs mt-auto pt-4 border-t border-[var(--color-border)]">
+                  <span className="text-[var(--color-text-secondary)] truncate pr-4">{cert.issuer}</span>
+                  <span className="text-[var(--color-text-tertiary)] font-mono shrink-0">{cert.year}</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
       </div>
     </section>
   );
-};
-
-export default Journey;
+}
