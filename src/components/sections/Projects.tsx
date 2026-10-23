@@ -1,176 +1,212 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { projects } from '../../data/portfolio';
-import { useInView, usePrefersReducedMotion } from '../../hooks/useAnimations';
+import { ArrowUpRight, X, Plus } from 'lucide-react';
+import { projects, type Project } from '../../data/portfolio';
+import { lockScroll } from '../../lib/scroll';
+import { Reveal, SectionHeader } from '../ui/Reveal';
+import { GithubIcon } from '../ui/Icons';
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      delay: i * 0.1,
-      ease: [0.16, 1, 0.3, 1] as const,
-    },
-  }),
+const categoryLabel: Record<Project['category'], string> = {
+  fullstack: 'Full-stack',
+  backend: 'Backend',
+  frontend: 'Frontend',
+  tools: 'Dev tooling',
+  algorithms: 'Algorithms',
 };
 
-function ProjectCard({ project, index, onSelect }: any) {
-  const reducedMotion = usePrefersReducedMotion();
-  
-  // Choose accent color by category
-  const getAccentColor = (category: string) => {
-    switch (category.toLowerCase()) {
-      case 'full stack': return '#64ffda';
-      case 'backend': return '#ffa364';
-      case 'frontend': return '#64b5ff';
-      default: return '#c084fc';
-    }
-  };
-  
-  const accentColor = getAccentColor(project.category);
-
+function ProjectLinks({ project, compact = false }: { project: Project; compact?: boolean }) {
+  const size = compact ? '!h-9 !px-3.5 text-[0.82rem]' : '';
   return (
-    <motion.div
-      variants={fadeUp}
-      custom={index}
-      initial={reducedMotion ? 'visible' : 'hidden'}
-      whileInView="visible"
-      viewport={{ once: true, margin: '-50px' }}
-      className={`group relative flex flex-col justify-between bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-sm overflow-hidden transition-colors duration-500 hover:border-[${accentColor}50] cursor-pointer`}
-      onClick={() => onSelect(project.id)}
-      style={{ height: '100%' }}
-    >
-      <div className="absolute top-0 left-0 w-full h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)` }} />
-      
-      <div className="p-10 sm:p-14 flex-grow flex flex-col">
-        <div className="flex justify-between items-start mb-6">
-          <span 
-            className="text-[10px] sm:text-xs font-mono uppercase tracking-wider px-3 py-1 rounded-sm border"
-            style={{ color: accentColor, borderColor: `${accentColor}30`, backgroundColor: `${accentColor}08` }}
-          >
-            {project.category}
-          </span>
-          <span className="text-[var(--color-text-tertiary)] font-mono text-xs sm:text-sm">
-            {project.year}
-          </span>
-        </div>
-
-        <h3 className="text-2xl sm:text-3xl font-bold text-[var(--color-text-primary)] mb-3 group-hover:text-[var(--color-accent)] transition-colors duration-300">
-          {project.title}
-        </h3>
-        
-        <p className="serif-italic text-lg sm:text-xl text-[var(--color-text-secondary)] mb-6">
-          {project.subtitle}
-        </p>
-
-        <p className="text-[var(--color-text-secondary)] body-md mb-8 flex-grow">
-          {project.description}
-        </p>
-
-        <div className="flex flex-wrap gap-2 mt-auto">
-          {project.techStack.map((tech: string) => (
-            <span 
-              key={tech} 
-              className="text-[10px] sm:text-xs font-mono px-2 py-1 rounded-sm bg-[var(--color-bg-tertiary)] border border-[var(--color-border)] text-[var(--color-text-tertiary)]"
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
-      </div>
-    </motion.div>
+    <div className="flex flex-wrap items-center gap-2">
+      <a
+        href={project.githubUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(e) => e.stopPropagation()}
+        className={`btn btn-ghost ${size}`}
+        aria-label={`${project.title} source code on GitHub`}
+      >
+        <GithubIcon className="h-4 w-4" />
+        Code
+      </a>
+      {project.liveUrl && (
+        <a
+          href={project.liveUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className={`btn btn-ghost ${size}`}
+          aria-label={`${project.title} live demo`}
+        >
+          Live
+          <ArrowUpRight className="h-4 w-4" />
+        </a>
+      )}
+    </div>
   );
 }
 
-function ProjectDetail({ project, onClose }: any) {
-  const accentColor = '#64ffda';
+function ProjectCard({
+  project,
+  index,
+  wide,
+  onOpen,
+}: {
+  project: Project;
+  index: number;
+  wide: boolean;
+  onOpen: () => void;
+}) {
+  return (
+    <Reveal as="article" delay={(index % 2) * 0.06} className={wide ? 'md:col-span-2' : ''}>
+      <div
+        className={`card card-hover spotlight group flex h-full flex-col p-6 sm:p-8 ${
+          wide ? 'lg:grid lg:grid-cols-[1.1fr_1fr] lg:gap-12 lg:p-10' : ''
+        }`}
+      >
+        <div className="flex flex-col">
+          <div className="flex items-center justify-between gap-4">
+            <span className="font-mono text-xs text-[var(--color-text-tertiary)]">
+              {String(index + 1).padStart(2, '0')} · {categoryLabel[project.category]}
+            </span>
+            <span className="font-mono text-xs text-[var(--color-text-tertiary)]">{project.year}</span>
+          </div>
+
+          <h3 className="mt-6 text-[1.75rem] font-semibold leading-tight tracking-tight sm:text-3xl">
+            {project.title}
+          </h3>
+          <p className="mt-1.5 text-[var(--color-text-tertiary)]">{project.subtitle}</p>
+
+          <p className="body-md mt-5">{project.description}</p>
+
+          <div className="mt-6 flex flex-wrap gap-1.5">
+            {project.techStack.map((tech) => (
+              <span key={tech} className="chip">
+                {tech}
+              </span>
+            ))}
+          </div>
+
+          <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-8">
+            <ProjectLinks project={project} compact />
+            <button
+              type="button"
+              onClick={onOpen}
+              className="inline-flex items-center gap-1.5 text-sm text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-accent)]"
+              aria-haspopup="dialog"
+            >
+              Case study
+              <Plus className="h-4 w-4 transition-transform duration-300 group-hover:rotate-90" />
+            </button>
+          </div>
+        </div>
+
+        {wide && (
+          <ul className="mt-8 hidden flex-col justify-center gap-px overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-border)] lg:mt-0 lg:flex">
+            {project.highlights.slice(0, 4).map((h) => (
+              <li key={h} className="flex gap-3 bg-[var(--color-surface)] px-5 py-4 text-[0.9rem] text-[var(--color-text-secondary)]">
+                <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                {h}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </Reveal>
+  );
+}
+
+function ProjectDialog({ project, onClose }: { project: Project; onClose: () => void }) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const prev = document.activeElement as HTMLElement | null;
+    lockScroll(true);
+    closeRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      lockScroll(false);
+      prev?.focus();
+    };
+  }, [onClose]);
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-12 bg-[var(--color-bg-primary)]/90 backdrop-blur-md"
+      transition={{ duration: 0.2 }}
+      className="fixed inset-0 z-[100] flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center sm:p-6"
       onClick={onClose}
     >
       <motion.div
-        initial={{ y: 50, opacity: 0, scale: 0.98 }}
-        animate={{ y: 0, opacity: 1, scale: 1 }}
-        exit={{ y: 20, opacity: 0, scale: 0.98 }}
-        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-sm shadow-2xl relative"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="project-dialog-title"
+        initial={{ y: 40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 24, opacity: 0 }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         onClick={(e) => e.stopPropagation()}
+        data-lenis-prevent
+        className="card relative max-h-[92svh] w-full max-w-3xl overflow-y-auto overscroll-contain rounded-b-none sm:rounded-2xl"
       >
-        <div className="p-8 md:p-12">
-          <button 
-            onClick={onClose}
-            className="absolute top-6 right-6 p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </button>
-
-          <span
-            className="text-xs font-medium uppercase tracking-wider px-3 py-1 rounded-sm border inline-block mb-6 font-mono"
-            style={{ color: accentColor, borderColor: `${accentColor}30`, backgroundColor: `${accentColor}08` }}
-          >
-            {project.category}
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-surface-2)]/90 px-6 py-4 backdrop-blur sm:px-8">
+          <span className="font-mono text-xs text-[var(--color-text-tertiary)]">
+            Case study · {categoryLabel[project.category]} · {project.year}
           </span>
+          <button
+            ref={closeRef}
+            type="button"
+            onClick={onClose}
+            aria-label="Close case study"
+            className="grid h-9 w-9 place-items-center rounded-full border border-[var(--color-border)] text-[var(--color-text-secondary)] transition-colors hover:border-[var(--color-border-strong)] hover:text-[var(--color-text-primary)]"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
 
-          <h3 className="text-3xl md:text-5xl font-bold text-[var(--color-text-primary)] mb-3 tracking-tight">
+        <div className="px-6 py-8 sm:px-8 sm:py-10">
+          <h3 id="project-dialog-title" className="heading-lg">
             {project.title}
           </h3>
-          <p className="serif-italic text-xl md:text-2xl text-[var(--color-text-secondary)] mb-12">
-            {project.subtitle}
-          </p>
+          <p className="mt-2 text-lg text-[var(--color-text-tertiary)]">{project.subtitle}</p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
+          <div className="mt-10 grid gap-8 sm:grid-cols-2">
             <div>
-              <h4 className="text-xs font-mono uppercase tracking-wider mb-4 text-[var(--color-accent)]">The Problem</h4>
-              <p className="body-md">{project.problem}</p>
+              <h4 className="eyebrow">The problem</h4>
+              <p className="body-md mt-3">{project.problem}</p>
             </div>
             <div>
-              <h4 className="text-xs font-mono uppercase tracking-wider mb-4 text-[var(--color-accent)]">The Solution</h4>
-              <p className="body-md">{project.solution}</p>
+              <h4 className="eyebrow">The solution</h4>
+              <p className="body-md mt-3">{project.solution}</p>
             </div>
           </div>
 
-          <div className="mb-12">
-            <h4 className="text-xs font-mono uppercase tracking-wider mb-6 text-[var(--color-accent)]">Engineering Highlights</h4>
-            <ul className="space-y-4">
-              {project.highlights.map((highlight: string, i: number) => (
-                <li key={i} className="flex gap-4 body-md items-start">
-                  <span className="mt-2 w-1.5 h-1.5 rounded-full shrink-0 bg-[var(--color-accent)]" />
-                  <span>{highlight}</span>
+          <div className="mt-10">
+            <h4 className="eyebrow">Engineering highlights</h4>
+            <ul className="mt-4 divide-y divide-[var(--color-border)] border-y border-[var(--color-border)]">
+              {project.highlights.map((h) => (
+                <li key={h} className="flex gap-3 py-3.5 text-[0.95rem] text-[var(--color-text-secondary)]">
+                  <span className="mt-[10px] h-1 w-1 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                  {h}
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="flex flex-wrap gap-4 pt-8 border-t border-[var(--color-border)]">
-            <a
-              href={project.githubUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-sm border border-[var(--color-border)] text-[var(--color-text-primary)] hover:text-[var(--color-accent)] hover:border-[var(--color-accent)] transition-colors text-sm font-mono font-medium"
-            >
-              Source Code
-            </a>
-            {project.liveUrl && (
-              <a
-                href={project.liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-sm bg-[var(--color-accent)] text-[#0a0a0f] text-sm font-mono font-medium hover:opacity-90 transition-opacity"
-              >
-                Live Demo
-              </a>
-            )}
+          <div className="mt-8 flex flex-wrap gap-1.5">
+            {project.techStack.map((tech) => (
+              <span key={tech} className="chip">
+                {tech}
+              </span>
+            ))}
+          </div>
+
+          <div className="mt-10">
+            <ProjectLinks project={project} />
           </div>
         </div>
       </motion.div>
@@ -179,71 +215,50 @@ function ProjectDetail({ project, onClose }: any) {
 }
 
 export default function Projects() {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [sectionRef, inView] = useInView(0.1);
-  const reducedMotion = usePrefersReducedMotion();
-
-  const selectedProject = projects.find((p) => p.id === selectedId) || null;
-  const featuredProjects = projects.filter((p) => p.featured);
-  const otherProjects = projects.filter((p) => !p.featured);
+  const [selected, setSelected] = useState<Project | null>(null);
+  const ordered = [...projects.filter((p) => p.featured), ...projects.filter((p) => !p.featured)];
 
   return (
     <section id="projects" className="section-padding relative">
-      <div className="section-container" ref={sectionRef as any}>
-        <motion.div
-          variants={fadeUp}
-          initial={reducedMotion ? 'visible' : 'hidden'}
-          animate={inView ? 'visible' : 'hidden'}
-          custom={0}
-          className="mb-6"
-        >
-          <span className="label">Selected Work</span>
-        </motion.div>
+      <div className="section-container">
+        <SectionHeader
+          index="02"
+          label="Selected work"
+          title={
+            <>
+              Projects built with <span className="serif-italic text-[var(--color-accent)]">purpose</span>.
+            </>
+          }
+          description="Real problems I wanted solved — engineered past the tutorial stage, measured, and shipped."
+        />
 
-        <motion.h2
-          variants={fadeUp}
-          initial={reducedMotion ? 'visible' : 'hidden'}
-          animate={inView ? 'visible' : 'hidden'}
-          custom={1}
-          className="heading-lg mb-6 max-w-[700px]"
-        >
-          Projects built with <span className="serif-italic text-[var(--color-accent)]">purpose</span>.
-        </motion.h2>
-
-        <motion.p
-          variants={fadeUp}
-          initial={reducedMotion ? 'visible' : 'hidden'}
-          animate={inView ? 'visible' : 'hidden'}
-          custom={2}
-          className="body-lg mb-16 max-w-[600px]"
-        >
-          Each project represents a real problem I wanted to solve, moving beyond standard tutorials into genuine engineering challenges.
-        </motion.p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
-          {featuredProjects.map((project, i) => (
-            <ProjectCard key={project.id} project={project} index={i} onSelect={setSelectedId} />
+        <div className="grid gap-5 md:grid-cols-2">
+          {ordered.map((project, i) => (
+            <ProjectCard
+              key={project.id}
+              project={project}
+              index={i}
+              wide={i === 0 || (i === ordered.length - 1 && (ordered.length - 1) % 2 === 1)}
+              onOpen={() => setSelected(project)}
+            />
           ))}
         </div>
 
-        {otherProjects.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            {otherProjects.map((project, i) => (
-              <ProjectCard
-                key={project.id}
-                project={project}
-                index={featuredProjects.length + i}
-                onSelect={setSelectedId}
-              />
-            ))}
-          </div>
-        )}
+        <Reveal className="mt-10 flex justify-center">
+          <a
+            href="https://github.com/aviralkaushik412?tab=repositories"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="link-underline inline-flex items-center gap-1.5 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+          >
+            More on GitHub
+            <ArrowUpRight className="h-4 w-4" />
+          </a>
+        </Reveal>
       </div>
 
       <AnimatePresence>
-        {selectedProject && (
-          <ProjectDetail project={selectedProject} onClose={() => setSelectedId(null)} />
-        )}
+        {selected && <ProjectDialog project={selected} onClose={() => setSelected(null)} />}
       </AnimatePresence>
     </section>
   );

@@ -1,210 +1,166 @@
-import { useRef } from 'react';
-import { motion } from 'framer-motion';
+import { ArrowUpRight, Award } from 'lucide-react';
 import { experience, education, codingProfiles, certificates } from '../../data/portfolio';
-import { useInView, usePrefersReducedMotion } from '../../hooks/useAnimations';
+import { Reveal, SectionHeader } from '../ui/Reveal';
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      delay: i * 0.1,
-      ease: [0.16, 1, 0.3, 1] as const,
-    },
-  }),
-};
-
-export default function Journey() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(0.1);
-  const reducedMotion = usePrefersReducedMotion();
-
+function SubHeading({ children }: { children: React.ReactNode }) {
   return (
-    <section id="journey" ref={sectionRef} className="section-padding relative">
+    <h3 className="mb-6 font-mono text-xs uppercase tracking-[0.14em] text-[var(--color-text-tertiary)]">
+      {children}
+    </h3>
+  );
+}
+
+export default function Experience() {
+  return (
+    <section id="journey" className="section-padding relative">
       <div className="section-container">
-        <motion.div
-          variants={fadeUp}
-          initial={reducedMotion ? 'visible' : 'hidden'}
-          animate={isInView ? 'visible' : 'hidden'}
-          custom={0}
-          className="mb-8"
-        >
-          <span className="label">Background</span>
-        </motion.div>
+        <SectionHeader
+          index="03"
+          label="Experience"
+          title={
+            <>
+              Where I've <span className="serif-italic text-[var(--color-accent)]">shipped</span> so far.
+            </>
+          }
+        />
 
-        <motion.h2
-          variants={fadeUp}
-          initial={reducedMotion ? 'visible' : 'hidden'}
-          animate={isInView ? 'visible' : 'hidden'}
-          custom={1}
-          className="heading-lg mb-20 max-w-[700px]"
-        >
-          My <span className="serif-italic text-[var(--color-accent)]">Journey</span> so far.
-        </motion.h2>
-
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1px_1fr] gap-12 lg:gap-0 relative">
-          {/* Desktop Center Line */}
-          <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-[var(--color-border)] -translate-x-1/2 z-0" />
-
-          {/* EXPERIENCE SECTION */}
-          <div className="lg:pr-16 relative z-10">
-            <h3 className="heading-md mb-8 text-[var(--color-text-primary)]">Experience</h3>
-            <div className="space-y-20">
-              {experience.map((exp, index) => (
-                <motion.div
-                  key={exp.id}
-                  variants={fadeUp}
-                  initial={reducedMotion ? 'visible' : 'hidden'}
-                  whileInView="visible"
-                  viewport={{ once: true, margin: '-50px' }}
-                  custom={index}
-                  className="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] p-10 md:p-12 rounded-sm hover:border-[var(--color-accent-dim)] transition-colors relative"
-                >
-                  <div className="hidden lg:block absolute top-8 -right-[64px] w-3 h-3 rounded-full bg-[var(--color-bg-primary)] border-2 border-[var(--color-accent)] z-20" />
-                  
-                  <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-2">
-                    <div>
-                      <h4 className="text-xl font-bold text-[var(--color-text-primary)]">{exp.role}</h4>
-                      <div className="text-[var(--color-accent)] font-medium mt-1">{exp.company}</div>
+        <div className="grid gap-16 lg:grid-cols-[1.5fr_1fr] lg:gap-16">
+          {/* Work */}
+          <div>
+            <SubHeading>Work</SubHeading>
+            <ol className="relative space-y-6">
+              {experience.map((exp) => (
+                <Reveal as="li" key={exp.id}>
+                  <div className="card spotlight p-6 sm:p-8">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <h4 className="text-xl font-semibold tracking-tight">{exp.role}</h4>
+                        <p className="mt-1 text-[var(--color-text-secondary)]">
+                          <span className="text-[var(--color-accent)]">{exp.company}</span>
+                          <span className="mx-2 text-[var(--color-text-muted)]">·</span>
+                          {exp.type}
+                          <span className="mx-2 text-[var(--color-text-muted)]">·</span>
+                          {exp.location}
+                        </p>
+                      </div>
+                      <span className="chip self-start">{exp.period}</span>
                     </div>
-                    <span className="text-xs font-mono text-[var(--color-text-secondary)] bg-[var(--color-bg-tertiary)] px-3 py-1.5 rounded-sm border border-[var(--color-border)] shrink-0 self-start">
-                      {exp.period}
-                    </span>
-                  </div>
-                  
-                  <ul className="space-y-3 mb-8">
-                    {exp.description.map((desc, i) => (
-                      <li key={i} className="text-[var(--color-text-secondary)] body-md flex items-start gap-3">
-                        <span className="text-[var(--color-accent)] mt-2 w-1 h-1 rounded-full shrink-0" />
-                        <span>{desc}</span>
-                      </li>
-                    ))}
-                  </ul>
 
-                  <div className="flex flex-wrap gap-2">
-                    {exp.techStack.map((tech, i) => (
-                      <span key={i} className="text-[10px] font-mono text-[var(--color-text-tertiary)] bg-[var(--color-bg-tertiary)] px-2 py-1 rounded-sm border border-[var(--color-border)]">
-                        {tech}
-                      </span>
-                    ))}
+                    <ul className="mt-6 space-y-3">
+                      {exp.description.map((d) => (
+                        <li key={d} className="flex gap-3 body-md">
+                          <span className="mt-[11px] h-1 w-1 shrink-0 rounded-full bg-[var(--color-accent)]" />
+                          <span>{d}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="mt-6 flex flex-wrap gap-1.5 border-t border-[var(--color-border)] pt-6">
+                      {exp.techStack.map((t) => (
+                        <span key={t} className="chip">
+                          {t}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </motion.div>
+                </Reveal>
               ))}
-            </div>
+            </ol>
           </div>
 
-          {/* Desktop Spacer for Layout */}
-          <div className="hidden lg:block" />
-
-          {/* Desktop Spacer for Layout */}
-          <div className="hidden lg:block" />
-
-          {/* EDUCATION SECTION */}
-          <div className="lg:pl-16 relative z-10 lg:-mt-48">
-            <h3 className="heading-md mb-8 text-[var(--color-text-primary)]">Education</h3>
-            <div className="space-y-16">
-              {education.map((edu, index) => (
-                <motion.div
-                  key={edu.id}
-                  variants={fadeUp}
-                  initial={reducedMotion ? 'visible' : 'hidden'}
-                  whileInView="visible"
-                  viewport={{ once: true, margin: '-50px' }}
-                  custom={index}
-                  className="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] p-10 md:p-12 rounded-sm relative"
-                >
-                  <div className="hidden lg:block absolute top-8 -left-[64px] w-3 h-3 rounded-full bg-[var(--color-bg-primary)] border-2 border-[var(--color-text-tertiary)] z-20" />
-                  
-                  <div className="flex flex-col mb-4">
-                    <h4 className="text-lg font-bold text-[var(--color-text-primary)]">{edu.degree}</h4>
-                    <span className="text-sm text-[var(--color-text-secondary)] mt-1">{edu.institution}</span>
-                  </div>
-                  
-                  <div className="flex justify-between items-center text-sm pt-4 border-t border-[var(--color-border)]">
-                    <span className="text-[var(--color-text-tertiary)]">{edu.period}</span>
-                    <span className="text-[var(--color-accent)] font-mono font-medium">{edu.score}</span>
-                  </div>
-                </motion.div>
+          {/* Education timeline */}
+          <div>
+            <SubHeading>Education</SubHeading>
+            <ol className="relative border-l border-[var(--color-border-strong)] pl-6">
+              {education.map((edu, i) => (
+                <Reveal as="li" key={edu.id} delay={i * 0.05} className="relative pb-8 last:pb-0">
+                  <span
+                    className={`absolute -left-[29px] top-1.5 h-[9px] w-[9px] rounded-full ring-4 ring-[var(--color-bg)] ${
+                      i === 0 ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-text-muted)]'
+                    }`}
+                  />
+                  <p className="font-mono text-xs text-[var(--color-text-tertiary)]">{edu.period}</p>
+                  <h4 className="mt-1.5 font-medium leading-snug">{edu.degree}</h4>
+                  <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+                    {edu.institution} · {edu.location}
+                  </p>
+                  <p className="mt-2 font-mono text-sm text-[var(--color-accent)]">{edu.score}</p>
+                </Reveal>
               ))}
-            </div>
+            </ol>
           </div>
         </div>
 
-        {/* PROBLEM SOLVING SECTION */}
-        <div className="mt-48">
-          <motion.div
-            variants={fadeUp}
-            initial={reducedMotion ? 'visible' : 'hidden'}
-            whileInView="visible"
-            viewport={{ once: true, margin: '-50px' }}
-            className="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border)] p-12 md:p-24 rounded-sm relative overflow-hidden"
-          >
-            <div className="text-center mb-16">
-              <h3 className="font-mono text-sm tracking-widest uppercase text-[var(--color-accent)] mb-8">Problem Solving</h3>
-              <div className="text-7xl md:text-8xl font-sans font-bold text-[var(--color-text-primary)] mb-2 tracking-tighter">
-                1300<span className="text-[var(--color-accent)]">+</span>
+        {/* Competitive programming */}
+        <div className="mt-24">
+          <SubHeading>Competitive programming</SubHeading>
+          <div className="grid gap-5 lg:grid-cols-[1fr_2fr]">
+            <Reveal>
+              <div className="card relative flex h-full flex-col justify-between overflow-hidden p-6 sm:p-8">
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[radial-gradient(closest-side,rgba(74,222,128,0.14),transparent)]"
+                />
+                <p className="text-sm text-[var(--color-text-secondary)]">Problems solved across platforms</p>
+                <p className="mt-10 text-6xl font-semibold tracking-tighter sm:text-7xl">
+                  1300<span className="text-[var(--color-accent)]">+</span>
+                </p>
               </div>
-              <div className="text-[var(--color-text-secondary)] tracking-widest uppercase text-sm font-medium">Total Problems Solved</div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 max-w-4xl mx-auto">
+            </Reveal>
+            <div className="grid gap-5 sm:grid-cols-3">
               {codingProfiles.map((profile, i) => (
-                <a 
-                  key={i} 
-                  href={profile.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="group flex flex-col p-8 bg-[var(--color-bg-tertiary)] rounded-sm border border-[var(--color-border)] hover:border-[var(--color-accent-dim)] transition-all duration-300"
-                >
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-[var(--color-text-primary)] font-medium group-hover:text-[var(--color-accent)] transition-colors">{profile.platform}</span>
-                    {profile.badge && <span className="text-[10px] font-mono text-[var(--color-accent)] bg-[var(--color-accent-dim)] px-2 py-1 rounded-sm uppercase tracking-wider">{profile.badge}</span>}
-                  </div>
-                  <div className="text-sm text-[var(--color-text-secondary)] mb-4 font-mono">{profile.handle}</div>
-                  <div className="text-sm text-[var(--color-text-tertiary)] mt-auto pt-4 border-t border-[var(--color-border)]">
-                    {profile.metric}: <span className="text-[var(--color-text-primary)] font-mono ml-1">{profile.metricValue}</span>
-                  </div>
-                </a>
+                <Reveal key={profile.platform} delay={i * 0.05}>
+                  <a
+                    href={profile.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="card card-hover spotlight group flex h-full flex-col p-6"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">{profile.platform}</span>
+                      <ArrowUpRight className="h-4 w-4 text-[var(--color-text-tertiary)] transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[var(--color-accent)]" />
+                    </div>
+                    <p className="mt-1 font-mono text-xs text-[var(--color-text-tertiary)]">@{profile.handle}</p>
+                    <div className="mt-auto pt-8">
+                      <p className="text-3xl font-semibold tracking-tight">{profile.metricValue}</p>
+                      <p className="mt-1 text-sm text-[var(--color-text-secondary)]">{profile.metric}</p>
+                      {profile.badge && (
+                        <p className="mt-3 inline-flex rounded-full bg-[var(--color-accent-soft)] px-2.5 py-1 font-mono text-[0.7rem] text-[var(--color-accent)]">
+                          {profile.badge}
+                        </p>
+                      )}
+                    </div>
+                  </a>
+                </Reveal>
               ))}
             </div>
-          </motion.div>
-        </div>
-
-        {/* CERTIFICATIONS */}
-        <div className="mt-48">
-          <motion.div
-            variants={fadeUp}
-            initial={reducedMotion ? 'visible' : 'hidden'}
-            whileInView="visible"
-            viewport={{ once: true, margin: '-50px' }}
-            className="mb-12"
-          >
-            <h3 className="heading-md text-[var(--color-text-primary)] text-center">Certifications</h3>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {certificates.slice(0, 5).map((cert, i) => (
-              <motion.div 
-                key={cert.id} 
-                variants={fadeUp}
-                initial={reducedMotion ? 'visible' : 'hidden'}
-                whileInView="visible"
-                viewport={{ once: true, margin: '-50px' }}
-                custom={i}
-                className="p-10 bg-[var(--color-bg-secondary)] rounded-sm border border-[var(--color-border)] flex flex-col h-full"
-              >
-                <h4 className="text-[var(--color-text-primary)] font-medium text-base mb-8 leading-relaxed flex-grow">{cert.title}</h4>
-                <div className="flex justify-between items-center text-xs mt-auto pt-4 border-t border-[var(--color-border)]">
-                  <span className="text-[var(--color-text-secondary)] truncate pr-4">{cert.issuer}</span>
-                  <span className="text-[var(--color-text-tertiary)] font-mono shrink-0">{cert.year}</span>
-                </div>
-              </motion.div>
-            ))}
           </div>
         </div>
 
+        {/* Certifications */}
+        <div className="mt-24">
+          <SubHeading>Certifications</SubHeading>
+          <Reveal>
+            <ul className="divide-y divide-[var(--color-border)] border-y border-[var(--color-border)]">
+              {certificates.map((cert) => (
+                <li
+                  key={cert.id}
+                  className="grid grid-cols-[auto_1fr_auto] items-center gap-4 py-4 sm:grid-cols-[auto_1fr_220px_auto] sm:gap-6"
+                >
+                  <Award className="h-4 w-4 text-[var(--color-text-tertiary)]" />
+                  <span className="font-medium">
+                    {cert.title}
+                    <span className="mt-0.5 block text-sm font-normal text-[var(--color-text-tertiary)] sm:hidden">
+                      {cert.issuer}
+                    </span>
+                  </span>
+                  <span className="hidden text-sm text-[var(--color-text-secondary)] sm:block">{cert.issuer}</span>
+                  <span className="font-mono text-xs text-[var(--color-text-tertiary)]">{cert.year}</span>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </div>
       </div>
     </section>
   );

@@ -290,11 +290,18 @@ export const skillCategories: SkillCategory[] = [
   },
 ];
 
+export const stats = [
+  { value: '1300+', label: 'DSA problems' },
+  { value: '2060', label: 'LeetCode rating' },
+  { value: '100+', label: 'SkillMirror users' },
+  { value: '9.37', label: 'CGPA' },
+];
+
 export const navItems = [
   { id: 'home', label: 'Home', href: '#home' },
   { id: 'about', label: 'About', href: '#about' },
   { id: 'projects', label: 'Work', href: '#projects' },
+  { id: 'journey', label: 'Experience', href: '#journey' },
   { id: 'skills', label: 'Skills', href: '#skills' },
-  { id: 'journey', label: 'Journey', href: '#journey' },
   { id: 'contact', label: 'Contact', href: '#contact' },
 ];

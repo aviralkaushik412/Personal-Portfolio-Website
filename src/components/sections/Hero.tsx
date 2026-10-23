@@ -1,149 +1,197 @@
-import { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { MagneticButton } from '../ui/MagneticButton';
-import { ChevronDown, Download, ArrowRight } from 'lucide-react';
-import { personalInfo } from '../../data/portfolio';
+import { motion } from 'framer-motion';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import { personalInfo, stats } from '../../data/portfolio';
 import { usePrefersReducedMotion } from '../../hooks/useAnimations';
+import { scrollToId } from '../../lib/scroll';
+import { GithubIcon, LinkedinIcon } from '../ui/Icons';
 
-export const Hero = () => {
-  const containerRef = useRef<HTMLElement>(null);
-  const prefersReducedMotion = usePrefersReducedMotion();
-  
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start start', 'end start'],
-  });
+const ease = [0.16, 1, 0.3, 1] as const;
 
-  const y = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-
-  const staggerContainer = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 30 },
-    show: { 
-      opacity: 1, 
-      y: 0,
-      transition: {
-        duration: 0.8,
-        ease: [0.16, 1, 0.3, 1] as const,
-      }
-    },
-  };
+function CodeCard() {
+  const k = 'text-[#c4b5fd]'; // keyword
+  const p = 'text-[#93c5fd]'; // property
+  const s = 'text-[#86efac]'; // string
+  const c = 'text-[var(--color-text-muted)]'; // punctuation / comment
+  const list = (items: string[]) => (
+    <>
+      <span className={c}>[</span>
+      {items.map((item, i) => (
+        <span key={item}>
+          <span className={s}>"{item}"</span>
+          {i < items.length - 1 && <span className={c}>, </span>}
+        </span>
+      ))}
+      <span className={c}>]</span>
+    </>
+  );
 
   return (
-    <section 
-      ref={containerRef}
-      className="relative min-h-[100svh] w-full flex items-center justify-center overflow-hidden bg-[var(--color-bg-primary)]"
-      id="home"
-    >
-      {/* Animated Grid Background */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:4rem_4rem]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_800px_at_50%_50%,#64ffda0a,transparent)]" />
+    <div className="card relative overflow-hidden shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)]">
+      <div className="flex items-center gap-2 border-b border-[var(--color-border)] px-4 py-3">
+        <span className="h-2.5 w-2.5 rounded-full bg-[#3f3f46]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#3f3f46]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-[#3f3f46]" />
+        <span className="ml-3 font-mono text-xs text-[var(--color-text-tertiary)]">aviral.ts</span>
+      </div>
+      <pre className="overflow-x-auto px-5 py-5 font-mono text-[0.8rem] leading-[1.85] text-[var(--color-text-secondary)]">
+        <code>
+          <span className={c}>{'// '}hello, world</span>
+          {'\n'}
+          <span className={k}>const</span> engineer <span className={c}>=</span> <span className={c}>{'{'}</span>
+          {'\n  '}
+          <span className={p}>name</span>
+          <span className={c}>: </span>
+          <span className={s}>"{personalInfo.name}"</span>
+          <span className={c}>,</span>
+          {'\n  '}
+          <span className={p}>role</span>
+          <span className={c}>: </span>
+          <span className={s}>"Software Engineer"</span>
+          <span className={c}>,</span>
+          {'\n  '}
+          <span className={p}>focus</span>
+          <span className={c}>: </span>
+          {list(['Backend', 'Full-stack', 'LLM evals'])}
+          <span className={c}>,</span>
+          {'\n  '}
+          <span className={p}>stack</span>
+          <span className={c}>: </span>
+          {list(['Java', 'Spring', 'TS', 'React'])}
+          <span className={c}>,</span>
+          {'\n  '}
+          <span className={p}>currently</span>
+          <span className={c}>: </span>
+          <span className={s}>"LLM Trainer @ Turing"</span>
+          <span className={c}>,</span>
+          {'\n  '}
+          <span className={p}>openTo</span>
+          <span className={c}>: </span>
+          <span className={s}>"SDE roles"</span>
+          <span className={c}>,</span>
+          {'\n'}
+          <span className={c}>{'};'}</span>
+          <span className="ml-0.5 inline-block h-4 w-[7px] translate-y-[3px] animate-pulse bg-[var(--color-accent)]" />
+        </code>
+      </pre>
+    </div>
+  );
+}
+
+export const Hero = () => {
+  const reduced = usePrefersReducedMotion();
+
+  const item = (delay: number) =>
+    reduced
+      ? {}
+      : {
+          initial: { opacity: 0, y: 20 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.8, delay, ease },
+        };
+
+  return (
+    <section id="home" className="relative overflow-hidden">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <div className="bg-grid absolute inset-0" />
+        <div className="absolute left-1/2 top-[-20%] h-[640px] w-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(74,222,128,0.10),transparent)]" />
       </div>
 
-      <motion.div 
-        className="relative z-10 w-full section-container pt-32 pb-24 flex flex-col justify-center"
-        style={prefersReducedMotion ? undefined : { y, opacity }}
-        variants={prefersReducedMotion ? undefined : staggerContainer}
-        initial="hidden"
-        animate="show"
-      >
-        <motion.div variants={fadeInUp} className="mb-6">
-          <p className="label">
-            Hi, my name is
-          </p>
-        </motion.div>
+      <div className="section-container relative flex min-h-[100svh] flex-col justify-center pt-28 pb-16">
+        <div className="grid items-center gap-14 lg:grid-cols-[1.25fr_1fr] lg:gap-16">
+          <div>
+            <motion.div {...item(0.05)}>
+              <span className="inline-flex items-center gap-2.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface)]/70 py-1.5 pl-3 pr-4 text-[0.8rem] text-[var(--color-text-secondary)] backdrop-blur">
+                <span className="pulse-dot" />
+                Open to SDE roles · {personalInfo.location}
+              </span>
+            </motion.div>
 
-        <motion.div variants={fadeInUp} className="mb-4">
-          <h1 
-            className="text-[var(--color-text-primary)] font-sans font-extrabold tracking-tight heading-xl" 
-          >
-            {personalInfo?.name || "Aviral Kaushik"}.
-          </h1>
-        </motion.div>
+            <motion.h1 {...item(0.12)} className="heading-xl mt-7">
+              {personalInfo.name}
+            </motion.h1>
 
-        <motion.div variants={fadeInUp} className="mb-8">
-          <h2 
-            className="text-[var(--color-text-secondary)] font-sans font-bold tracking-tight heading-lg flex flex-wrap gap-x-4 items-center" 
-          >
-            Software <span className="serif-italic text-[var(--color-text-primary)] font-normal">Engineer</span>.
-          </h2>
-        </motion.div>
+            <motion.p
+              {...item(0.2)}
+              className="mt-6 max-w-xl text-[clamp(1.25rem,2.1vw,1.6rem)] leading-snug tracking-tight text-[var(--color-text-secondary)]"
+            >
+              Software engineer building{' '}
+              <span className="serif-italic text-[1.15em] text-[var(--color-text-primary)]">scalable</span>{' '}
+              full-stack systems — from Spring Boot APIs to LLM evaluation infrastructure.
+            </motion.p>
 
-        <motion.div variants={fadeInUp} className="max-w-[700px] mb-12">
-          <p className="body-lg">
-            Building scalable systems, solving hard problems, and engineering products that matter.
-          </p>
-        </motion.div>
+            <motion.div {...item(0.28)} className="mt-10 flex flex-wrap items-center gap-3">
+              <a
+                href="#projects"
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToId('projects');
+                }}
+                className="btn btn-primary group"
+              >
+                View my work
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </a>
+              <a
+                href={personalInfo.resumeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn btn-ghost"
+              >
+                Resume
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
+              <span className="mx-1 hidden h-6 w-px bg-[var(--color-border-strong)] sm:block" />
+              <a
+                href={personalInfo.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub"
+                className="grid h-11 w-11 place-items-center rounded-full text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text-primary)]"
+              >
+                <GithubIcon className="h-5 w-5" />
+              </a>
+              <a
+                href={personalInfo.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                className="grid h-11 w-11 place-items-center rounded-full text-[var(--color-text-secondary)] transition-colors hover:bg-[var(--color-surface-2)] hover:text-[var(--color-text-primary)]"
+              >
+                <LinkedinIcon className="h-5 w-5" />
+              </a>
+            </motion.div>
+          </div>
 
-        <motion.div variants={fadeInUp} className="flex flex-wrap items-center gap-6 mb-16">
-          <MagneticButton 
-            href="#projects"
-            className="group relative inline-flex items-center gap-2 px-8 py-4 bg-[var(--color-accent)] text-[var(--color-bg-primary)] font-mono font-medium text-sm tracking-wide rounded-sm overflow-hidden transition-transform"
+          <motion.div
+            {...(reduced
+              ? {}
+              : {
+                  initial: { opacity: 0, y: 30, rotate: 0.5 },
+                  animate: { opacity: 1, y: 0, rotate: 0 },
+                  transition: { duration: 1, delay: 0.3, ease },
+                })}
+            className="hidden lg:block"
           >
-            <span>View My Work</span>
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-          </MagneticButton>
-          
-          <MagneticButton 
-            href={personalInfo?.resumeUrl || "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex items-center gap-2 px-8 py-4 border border-[var(--color-accent)] text-[var(--color-accent)] font-mono font-medium text-sm tracking-wide rounded-sm hover:bg-[var(--color-accent)] hover:text-[var(--color-bg-primary)] transition-colors"
-          >
-            <span>Download Resume</span>
-            <Download className="w-4 h-4" />
-          </MagneticButton>
-        </motion.div>
+            <CodeCard />
+          </motion.div>
+        </div>
 
-        <motion.div variants={fadeInUp} className="flex items-center gap-6 text-[var(--color-text-secondary)]">
-          <a 
-            href={personalInfo?.github || "#"} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="hover:text-[var(--color-accent)] transition-colors p-2 -ml-2"
-            aria-label="GitHub"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
-          </a>
-          <a 
-            href={personalInfo?.linkedin || "#"} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="hover:text-[var(--color-accent)] transition-colors p-2"
-            aria-label="LinkedIn"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
-          </a>
-        </motion.div>
-      </motion.div>
-
-      {/* Scroll indicator */}
-      <motion.div 
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[var(--color-text-secondary)] z-10 flex flex-col items-center gap-2 pointer-events-none"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 1 }}
-      >
-        <span className="font-mono text-[10px] tracking-widest uppercase text-[var(--color-accent)]">Scroll</span>
-        <motion.div
-          animate={prefersReducedMotion ? undefined : { y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+        <motion.dl
+          {...item(0.4)}
+          className="mt-16 grid grid-cols-2 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-border)] gap-px sm:grid-cols-4 lg:mt-24"
         >
-          <ChevronDown className="w-5 h-5 text-[var(--color-accent)]" />
-        </motion.div>
-      </motion.div>
+          {stats.map((stat) => (
+            <div key={stat.label} className="bg-[var(--color-bg)]/90 px-5 py-5 sm:px-6">
+              <dt className="font-mono text-[0.7rem] uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">
+                {stat.label}
+              </dt>
+              <dd className="mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
+                {stat.value}
+              </dd>
+            </div>
+          ))}
+        </motion.dl>
+      </div>
     </section>
   );
 };
